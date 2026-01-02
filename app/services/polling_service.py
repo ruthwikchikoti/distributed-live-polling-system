@@ -20,8 +20,10 @@ class PollingService:
         Task 2: Write to Redis immediately.
         Task 4: Buffer in memory (Batching).
         """
+        self._memory_storage[poll_id][option_id] += 1
+        
         # TODO: Implement vote logic based on the current task
-        raise NotImplemented
+        
 
     async def get_results(self, poll_id: str) -> Dict[str, int]:
         """
@@ -31,9 +33,10 @@ class PollingService:
         Task 3: Check App Cache -> Redis.
         Task 4: Redis + Memory Buffer.
         """
+        return self._memory_storage[poll_id]
         # TODO: Implement result fetching logic
         # Should return a dictionary like {"OptionA": 5, "OptionB": 3}
-        raise NotImplemented
+      
 
     async def flush_batch(self):
         """
