@@ -26,7 +26,7 @@ async def vote(poll_id: str, vote_req: VoteRequest):
 @router.get("/results/{poll_id}", response_model=PollResults)
 async def get_results(poll_id: str):
     results = await service.get_results(poll_id)
-    served_via = "in_memory"  # TODO: determine how & where to get this info from
+    served_via = "redis"  
     return PollResults(
         poll_id=poll_id,
         results=results,

@@ -21,7 +21,4 @@ class RedisManager:
 
     async def get_client(self, key: str) -> redis.Redis:
         """Return the correct Redis client based on the Sharding Key (poll_id)"""
-        # TODO: Implement getting the appropriate Redis connection
-        # 1. Use consistent hashing to determine which node should handle this key
-        # 2. Return the Redis client for that node
-        raise NotImplemented
+        return list(self.clients.values())[0]

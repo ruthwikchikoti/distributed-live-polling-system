@@ -20,9 +20,10 @@ class PollingService:
         Task 2: Write to Redis immediately.
         Task 4: Buffer in memory (Batching).
         """
-        self._memory_storage[poll_id][option_id] += 1
+        # Task 2:
+        redis_client = await self.redis_manager.get_client(poll_id)
         
-        # TODO: Implement vote logic based on the current task
+        await redis_client.hincrby(f"poll:{poll_id}", option_id, 1)
         
 
     async def get_results(self, poll_id: str) -> Dict[str, int]:
@@ -33,9 +34,16 @@ class PollingService:
         Task 3: Check App Cache -> Redis.
         Task 4: Redis + Memory Buffer.
         """
-        return self._memory_storage[poll_id]
-        # TODO: Implement result fetching logic
-        # Should return a dictionary like {"OptionA": 5, "OptionB": 3}
+        # Task 2: 
+        redis_client = await self.redis_manager.get_client(poll_id)
+      
+        results = await redis_client.hgetall(f"poll:{poll_id}")
+        
+        vote_counts = {}
+        for option, count in results.items():
+            vote_counts[option] = int(count)
+        
+        return vote_counts
       
 
     async def flush_batch(self):
