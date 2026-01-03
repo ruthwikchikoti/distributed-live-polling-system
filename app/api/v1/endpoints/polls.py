@@ -25,8 +25,7 @@ async def vote(poll_id: str, vote_req: VoteRequest):
 
 @router.get("/results/{poll_id}", response_model=PollResults)
 async def get_results(poll_id: str):
-    results = await service.get_results(poll_id)
-    served_via = "redis"  
+    results ,served_via= await service.get_results(poll_id) 
     return PollResults(
         poll_id=poll_id,
         results=results,
