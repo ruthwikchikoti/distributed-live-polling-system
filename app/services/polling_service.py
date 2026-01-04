@@ -35,14 +35,15 @@ class PollingService:
         Task 3: Check App Cache -> Redis.
         Task 4: Redis + Memory Buffer.
         """
-        # Task 2: 
+        # Task 2 & 5: 
         redis_client = await self.redis_manager.get_client(poll_id)
+        redis_port = self.redis_manager.get_port(poll_id)
 
         # Task 3:
         current_time = time.time()
 
         # Get base results (from cache or Redis)
-        served_via = "redis"
+        served_via = f"redis_{redis_port}"
         if poll_id in self.__cache:
             cached_data = self.__cache[poll_id]
             age = current_time - cached_data["timestamp"]
@@ -52,7 +53,7 @@ class PollingService:
             else:
                 del self.__cache[poll_id]
         
-        if served_via == "redis":
+        if served_via.startswith("redis_"):
             results = await redis_client.hgetall(f"poll:{poll_id}")
             vote_counts = {}
             for option, count in results.items():
@@ -61,6 +62,7 @@ class PollingService:
                 "results": vote_counts.copy(),
                 "timestamp": current_time
             }
+            served_via = f"redis_{redis_port}"
         
         # Task 4: Always add buffer values (once, at the end)
         pending = self._memory_storage.get(poll_id, {})
